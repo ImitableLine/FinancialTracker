@@ -1,0 +1,236 @@
+﻿@page
+@using FinancialTracker.Models
+@model FinancialTracker.Pages.IndexModel
+
+
+
+<div class="page-container">
+
+    @if (HttpContext.Session.GetInt32("userid") != null)
+    {
+        <!-- Navigation Tabs -->
+        <nav class="tab-nav">
+            <ul>
+                <li><a href="#dashboard" class="tab-link active" onclick="changeTab('dashboard')">Dashboard</a></li>
+                <li><a href="#accounts" class="tab-link" onclick="changeTab('accounts')">Accounts</a></li>
+                <li><a href="#budgets" class="tab-link" onclick="changeTab('budgets')">Budgets</a></li>
+                <li><a href="#transactions" class="tab-link" onclick="changeTab('transactions')">Transactions</a></li>
+                @* <li><a href="#charts" class="tab-link" onclick="changeTab('charts')">Visualization</a></li> *@
+            </ul>
+        </nav>
+           
+
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <h2>Welcome, @Model.LoggedInUser.username!</h2>
+
+                <!-- Account Balances -->
+                <h3>Account Balances:</h3>
+                <ul>
+                    @foreach (var account in Model.Accounts)
+                    {
+                        <li><b>@account.accountname</b> (@account.accounttype): $@account.balance</li>
+                    }
+                </ul>
+
+               
+
+                <!-- Reminders -->
+                <h3>Reminders:</h3>
+                <ul>
+                    @foreach (var reminder in Model.Reminders.Where(r => !r.iscompleted))
+                    {
+                        <li><b>@reminder.title:</b> Due on @reminder.duedate.ToShortDateString()</li>
+                    }
+                </ul>
+
+                <!-- Recent Transactions -->
+                <h3>Recent Transactions:</h3>
+                <ul>
+                    @foreach (var transaction in Model.Accounts.SelectMany(a => a.transactions.OrderByDescending(t => t.date).Take(5)))
+                    {
+                        <li><b>@transaction.transactiontype:</b> $@transaction.amount on @transaction.date.ToShortDateString() (Category: @transaction.category)</li>
+                    }
+                </ul>
+            </div>
+        <div id="accounts" class="tab-content">
+            <h3>Account Balances:</h3>
+            <ul class="account-ul">
+                @if (Model.Accounts != null && Model.Accounts.Any())
+                {
+                    @foreach (var account in Model.Accounts)
+                    {
+                        <li class="account-li" id="account-@account.id">
+                            <span>
+                                <b>@account.accountname</b> (@account.accounttype): $@account.balance
+                            </span>
+                            <div>
+                                <button type="button" class="edit-btn"
+                                        onclick="openEditModal('@account.id', '@account.accountname', '@account.accounttype', '@account.balance')">
+                                    Edit
+                                </button>
+                                <form method="post" asp-page-handler="DeleteAccount" style="display: inline;">
+                                    <input type="hidden" name="accountId" value="@account.id" />
+                                    <button type="submit" class="delete-btn-account">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                    }
+                }
+            </ul>
+
+            <h3>Create a New Account</h3>
+            <form method="post" asp-page-handler="CreateAccount">
+                <label for="accountName">Account Name:</label>
+                <input type="text" id="accountName" name="accountName" required />
+
+                <label for="accountType">Account Type:</label>
+                <input type="text" id="accountType" name="accountType" required />
+
+                <label for="balance">Initial Balance:</label>
+                <input type="number" id="balance" name="balance" step="0.01" required />
+
+                <button type="submit">Create Account</button>
+            </form>
+        </div>
+
+           
+
+            <!-- Edit Account Modal -->
+            <div id="editAccountModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal('editAccountModal')">&times;</span>
+                    <h3>Edit Account</h3>
+                    <form method="post" asp-page-handler="Save" id="editAccountForm" class="modal-form">
+                        <input type="hidden" id="editAccountId" name="accountId" />
+                        <label for="editAccountName">Account Name:</label>
+                        <input type="text" id="editAccountName" name="accountName" required />
+
+                        <label for="editAccountType">Account Type:</label>
+                        <input type="text" id="editAccountType" name="accountType" required />
+
+                        <label for="editBalance">Balance:</label>
+                        <input type="number" id="editBalance" name="balance" step="0.01" required />
+
+                        <button class="save-btn" type="submit">Save Changes</button>
+                      
+                    </form>
+                    <!-- Delete Confirmation Modal -->
+                    <div id="deleteConfirmationModal" class="modal">
+                        <div class="modal-content">
+                            <span class="close" onclick="closeModal('deleteConfirmationModal')">&times;</span>
+                            <h3>Are you sure you want to delete this account?</h3>
+                            <button type="button" onclick="deleteAccount()">Yes, Delete</button>
+                            <button type="button" onclick="closeModal('deleteConfirmationModal')">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Budgets -->
+            <div id="budgets" class="tab-content">
+                @await Html.PartialAsync("Partials/Budgets.cshtml") 
+
+            </div>
+
+            <!-- Transactions Tab -->
+            <div id="transactions" class="tab-content">
+                 @await Html.PartialAsync("Partials/Transactions.cshtml") 
+            </div>
+
+@*             <!-- Charts & Graphs Tab -->
+            <div id="charts" class="tab-content">
+                <h3>Charts & Graphs</h3>
+                <p>Coming soon: Visualizations of your financial data.</p>
+            </div> *@
+       
+    }
+    else
+    {
+        <div class="message-container">
+            <div class="message-box">
+                <h2>Welcome to Financial Tracker!</h2>
+            </div>
+
+            <div class="test-accounts-box">
+                <h3>Test Accounts</h3>
+                <p><b>Username:</b> testuser <b>| Password:</b> hashed_password</p>
+                <p><b>Username:</b> seconduser <b>| Password:</b> hashed_password</p>
+            </div>
+        </div>
+    }
+
+
+ <script>
+        function changeTab(tabId) {
+            var activeContent = document.getElementById(tabId);
+            console.log(`Attempting to display tab: ${tabId}`);
+
+            // Hide all tab contents
+            var tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(function (content) {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tab links
+            var tabLinks = document.querySelectorAll('.tab-link');
+            tabLinks.forEach(function (link) {
+                link.classList.remove('active');
+            });
+
+            // Show the selected tab content
+            if (activeContent) {
+                activeContent.classList.add('active');
+            } else {
+                console.error(`Tab content with id ${tabId} not found.`);
+            }
+
+            // Set the active link
+            var activeLink = document.querySelector(`a[href="#${tabId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        }
+
+
+ </script>
+
+ <script>
+    function openEditModal(accountId, accountName, accountType, balance) {
+        
+        document.getElementById('editAccountId').value = accountId;
+        document.getElementById('editAccountName').value = accountName;
+        document.getElementById('editAccountType').value = accountType;
+        document.getElementById('editBalance').value = balance;
+        
+        
+        document.getElementById('editAccountModal').style.display = 'block';
+    }
+    function closeModal(modalId) {
+        
+        document.getElementById(modalId).style.display = 'none';
+    }
+</script>
+
+
+
+    <style>
+        .tab-content {
+            display: none; 
+        }
+
+            .tab-content.active {
+                display: block; 
+            }
+
+        .tab-link.active {
+            font-weight: bold; 
+        }
+    </style>
+
+</div>
+

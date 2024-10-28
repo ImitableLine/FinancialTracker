@@ -1,0 +1,80 @@
+﻿.login-page h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #000000;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.login-page form {
+    background-color: #f6f6f6;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 400px;
+    margin: 20px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+    .login-page form div {
+        margin-bottom: 15px;
+    }
+
+.login-page label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.login-page input[type="text"],
+.login-page input[type="email"],
+.login-page input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-page button[type="submit"] {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+    .login-page button[type="submit"]:hover {
+        background-color: #575757;
+    }
+
+.login-page p {
+    color: red;
+    text-align: center;
+    margin-top: 15px;
+}
+
+.register-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.register-button {
+    display: inline-block;
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+    .register-button:hover {
+        background-color: #575757;
+    }
+
+.register-text {
+    color: black !important;
+    margin-bottom: 8px;
+}

@@ -1,0 +1,64 @@
+﻿@using FinancialTracker.Models
+
+@{
+    var userId = ViewData["userid"] as int?;
+}
+
+
+
+<ul class="transaction-ul">
+    <h1>Transactions</h1>
+    @foreach (var transaction in Model.Transactions)
+    {
+        <li class="transaction-li">
+            <div class="transaction-details-container">
+            <div class="transaction-details">
+                <div>
+                    <b>@transaction.transactiontype: </b>
+                    $@transaction.amount||     
+                    @transaction.date.ToShortDateString()
+                 </div>
+                     
+                 <div>
+                    <b>Account:</b> @transaction.account?.accountname ||
+                    <b>Category:</b> @transaction.category
+                </div>
+                </div>
+                <form method="post" asp-page-handler="TransactionDelete" onsubmit="return confirm('Are you sure you want to delete this transaction?');">
+                    <input type="hidden" name="transactionId" value="@transaction.id" />
+                    <button type="submit" class="delete-transaction">Delete</button>
+                </form>
+            </div>
+        </li>
+    }
+</ul>
+
+<h3 class="form-heading">Add Transaction</h3>
+<form method="post" class="transaction-form" asp-page-handler="AddTransaction">
+    <div class="form-group-transaction">
+        <label for="transactionAccount" class="form-label">Account:</label>
+        <select id="transaction-account" name="accountId" class="form-transaction-input" required>
+            <option value="" disabled selected>Select an Account</option>
+            @foreach (var account in Model.Accounts)
+            {
+                <option value="@account.id">@account.accountname</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group-transaction">
+        <label for="transactionType" class="form-label">Category:</label>
+        <input type="text" id="transaction-Category" name="category" class="form-transaction-input" required />
+    </div>
+
+    <div class="form-group-transaction">
+        <label for="transactionAmount" class="form-label">Amount:</label>
+        <input type="number" id="transaction-Amount" name="amount" class="form-transaction-input" step="0.01" required />
+    </div>
+    <div class="form-group-transaction">
+        <label for="transactionDate" class="form-label">Date:</label>
+        <input type="date" id="transaction-Date" name="date" class="form-transaction-input" required />
+    </div>
+
+    <button type="submit" class="save-btn-transaction">Add Transaction</button>
+</form>

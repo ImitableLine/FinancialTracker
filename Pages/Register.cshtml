@@ -1,0 +1,32 @@
+﻿@page
+@model FinancialTracker.Pages.RegisterModel
+
+<div class="login-page">
+    <h1>Register</h1>
+
+    <form method="post">
+        <div>
+            <label><b>Username:</b></label>
+            <input type="text" name="Username" required />
+        </div>
+        <div>
+            <label><b>Email:</b></label>
+            <input type="email" name="Email" required />
+        </div>
+        <div>
+            <label><b>Password:</b></label>
+            <input type="password" name="Password" required />
+        </div>
+        <button type="submit">Register</button>
+    </form>
+
+    @if (Model.ErrorMessage != null)
+    {
+        <p style="color: red;">@Model.ErrorMessage</p>
+    }
+
+    <div class="register-section">
+        <p class="register-text">Already have an account?</p>
+        <a href="/Login" class="register-button">Login</a>
+    </div>
+</div>
