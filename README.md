@@ -21,3 +21,10 @@ The PostgreSQL database consists of multiple tables designed to capture key elem
 - Accounts: Contains details of each financial account, including type and balance.
 - Budgets: Holds user-defined budget information, including category, amount, and date range.
 - Transactions: Logs transactions associated with specific accounts, enabling tracking of financial flows.
+
+## Installation and Setup
+To setup you will need postgrSQL and PgAdmin4
+- Install PostgreSQL and PgAdmin4
+- create a new PostgreSQL DB with the backup in repo
+- update your appsettings.json with your DB connection string
+- run app
